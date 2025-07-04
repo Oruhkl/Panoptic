@@ -1,0 +1,12 @@
+testMode: "assertion"
+prefix: "echidna_"
+coverage: true
+corpusDir: "echidna"
+balanceAddr: 0x1043561a8829300000
+balanceContract: 0x1043561a8829300000
+filterFunctions: []
+deployContracts: [["0x1f", "PanopticMath"],["0x2f", "PositionBalanceLibrary"],[ "0x3f","InteractionHelper"]]
+cryticArgs: ["--compile-libraries=(PanopticMath,0x1f), (PositionBalanceLibrary, 0x2f),(InteractionHelper,0x3f)", "--foundry-compile-all"]
+deployer: "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496"
+contractAddr: "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496"
+shrinkLimit: 100000

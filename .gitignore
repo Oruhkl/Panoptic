@@ -26,3 +26,11 @@ broadcast
 out
 docs
 safe-txns
+
+# Coverage files
+crytic-export
+echidna
+medusa
+
+test/properties.md
+lib
