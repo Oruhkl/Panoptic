@@ -17,6 +17,15 @@ import {ManagersTargets} from "./targets/ManagersTargets.sol";
 abstract contract TargetFunctions is AdminTargets, DoomsdayTargets, HypoVaultTargets, ManagersTargets {
     /// CUSTOM TARGET FUNCTIONS - Add your own target functions here ///
 
+    function hypoVault_executeDeposit_clamped_multiple_gh(uint256 epoch)
+        public
+        updateGhostsWithType(OpType.EXECUTE_DEPOSIT)
+        asActorEntropy(1)
+    {
+        require(epoch < hypoVault.depositEpoch());
+        hypoVault.executeDeposit(_getActor(), epoch);
+    }
+
     function hypoVault_executeDeposit_clamped_multiple(address user, uint256 epoch) public asActorEntropy(1) {
         require(epoch < hypoVault.depositEpoch());
         hypoVault.executeDeposit(user, epoch);

@@ -15,11 +15,7 @@ import "src/HypoVault.sol";
 abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
     /// CUSTOM TARGET FUNCTIONS - Add your own target functions here ///
 
-    function hypoVault_fulfillDeposits_clamped(uint256 assetsToFulfill, bytes memory managerInput)
-        public
-        asManager
-        stateless
-    {
+    function hypoVault_fulfillDeposits_clamped(uint256 assetsToFulfill, bytes memory managerInput) public asManager {
         (uint128 assetsDeposited,,) = hypoVault.getDepositEpochState(hypoVault.depositEpoch());
         if (assetsDeposited == 0) {
             uint256 assetsToDeposit;
@@ -36,12 +32,16 @@ abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
         hypoVault.fulfillDeposits(assetsToFulfill, managerInput);
     }
 
-    function hypoVault_executeDeposit_clamped(address user, uint256 epoch) public asActor {
+    function hypoVault_executeDeposit_clamped(uint256 epoch)
+        public
+        updateGhostsWithType(OpType.EXECUTE_DEPOSIT)
+        asActor
+    {
         require(epoch < hypoVault.depositEpoch());
-        hypoVault.executeDeposit(user, epoch);
+        hypoVault.executeDeposit(_getActor(), epoch);
     }
 
-    function hypoVault_executeWithdrawal_clamped(address user, uint256 epoch) public stateless {
+    function hypoVault_executeWithdrawal_clamped(address user, uint256 epoch) public {
         uint256 currentEpoch = hypoVault.depositEpoch();
         uint256 assets;
         assets = between(assets, 1e10, type(uint64).max);
@@ -79,7 +79,7 @@ abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
         hypoVault.executeWithdrawal(address(this), currentWithdrawalEpoch);
     }
 
-    function hypoVault_requestWithdrawal_clamped(uint128 shares) public stateless {
+    function hypoVault_requestWithdrawal_clamped(uint128 shares) public {
         uint256 currentEpoch = hypoVault.depositEpoch();
         uint256 assets;
         assets = between(assets, 1e10, type(uint64).max);
@@ -101,7 +101,7 @@ abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
         uint256 sharesToFulfill,
         uint256 maxAssetsReceived,
         bytes memory managerInput
-    ) public stateless {
+    ) public {
         uint256 currentEpoch = hypoVault.depositEpoch();
         uint256 assets;
         assets = between(assets, 1e10, type(uint64).max);
@@ -131,7 +131,7 @@ abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
         hypoVault.fulfillWithdrawals(sharesToFulfill, maxAssetsReceived, managerInput);
     }
 
-    function hypoVault_transfer_clamped(address to, uint256 amount) public stateless {
+    function hypoVault_transfer_clamped(address to, uint256 amount) public {
         address currentActor = _getActor();
         uint256 currentEpoch = hypoVault.depositEpoch();
         uint256 assets;
@@ -165,6 +165,10 @@ abstract contract HypoVaultTargets is BaseTargetFunctions, Properties {
 
     function hypoVault_executeDeposit(address user, uint256 epoch) public asActor {
         hypoVault.executeDeposit(user, epoch);
+    }
+
+    function hypoVault_executeDeposit_gh(uint256 epoch) public updateGhostsWithType(OpType.EXECUTE_DEPOSIT) asActor {
+        hypoVault.executeDeposit(_getActor(), epoch);
     }
 
     function hypoVault_executeWithdrawal(address user, uint256 epoch) public asActor {
